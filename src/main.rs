@@ -5,7 +5,7 @@ use std::cmp::Ordering;
 fn main() {
     println!("want to start with rust : https://www.rust-lang.org/learn/get-started");
     println!("Pick one menu!");
-    println!("1. guessing game\n2. shadowing\n3. length of input\n4. data types\n5. functions\n6. loop and if");
+    println!("1. guessing game\n2. shadowing\n3. length of input\n4. data types\n5. functions\n6. loop and if\n7. ownership");
     // this works too!
     // println!("1. guessing game
     //  2. something
@@ -26,10 +26,44 @@ fn main() {
         "4" => data_types(),
         "5" => functions(),
         "6" => loop_and_if_statement(),
+        "7" => ownership(),
 
         // this is important to have in match without specifict operation / comparation function as the default return when there's no matches value
         _ => println!("something else!"),
     };
+}
+
+fn ownership() {
+    let s1 = String::from("hello");
+    
+    // take ownership
+    // let s2 = s1;
+    // println!("{}, world!", s1);
+    // you can't access s1 variable because it's already transfered to s2 and s1 goes out of scope
+    
+    // take the value and register to new allocation memory
+    let s2 = s1.clone();
+    println!("s1 = {}, s2 = {}", s1, s2);
+
+    // primitive values by default make a copy rather than taking the ownership of the memory
+    let x = 5;
+    let y = x;
+    println!("x = {}, y = {}", x, y);
+
+    let mut s = String::from("hello");
+    append_string(&mut s);
+
+    let got_referenced = no_dangle();
+    println!("{}", got_referenced);
+}
+
+fn append_string(some_string: &mut String) {
+    some_string.push_str(", world");
+}
+
+fn no_dangle() -> String {
+    let s = String::from("hello");
+    s
 }
 
 fn loop_and_if_statement() {
@@ -55,7 +89,7 @@ fn loop_and_if_statement() {
         number -= 1;
     }
     print!("\n");
-    
+
     let a = [1, 2, 3, 4];
     // enumerate func helps you to access both value and index from array
     for (i, val) in a.iter().enumerate() {
