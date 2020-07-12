@@ -3,6 +3,7 @@ mod datatype;
 mod loop_and_if;
 mod functions;
 mod guess_number;
+mod hash_vs_vector;
 
 use std::io;
 use ownership::ownership; // after importing from other file, you can actually "use" it for less syntax
@@ -10,7 +11,7 @@ use ownership::ownership; // after importing from other file, you can actually "
 fn main() {
     println!("want to start with rust : https://www.rust-lang.org/learn/get-started");
     println!("Pick one menu!");
-    println!("1. guessing game\n2. shadowing\n3. length of input\n4. data types\n5. functions\n6. loop and if\n7. ownership");
+    println!("1. guessing game\n2. shadowing\n3. length of input\n4. data types\n5. functions\n6. loop and if\n7. ownership\n8. hash vs vector on find string performance");
     // this works too!
     // println!("1. guessing game
     //  2. something
@@ -32,6 +33,7 @@ fn main() {
         "5" => functions::functions(),
         "6" => loop_and_if::loop_and_if_statement(),
         "7" => ownership(),
+        "8" => hash_vs_vector::hash_vs_vector_on_strings(),
 
         // this is important to have in match without specifict operation / comparation function as the default return when there's no matches value
         _ => println!("something else!"),
