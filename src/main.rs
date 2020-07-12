@@ -1,6 +1,11 @@
+mod ownership;
+mod datatype;
+mod loop_and_if;
+mod functions;
+mod guess_number;
+
 use std::io;
-use rand::Rng;
-use std::cmp::Ordering;
+use ownership::ownership; // after importing from other file, you can actually "use" it for less syntax
 
 fn main() {
     println!("want to start with rust : https://www.rust-lang.org/learn/get-started");
@@ -20,12 +25,12 @@ fn main() {
 
     // .trim() remove \n when input the value
     match guess.trim() {
-        "1" => guessing_number(),
+        "1" => guess_number::guessing_number(),
         "2" => shadowing_example(),
         "3" => get_the_length_input(),
-        "4" => data_types(),
-        "5" => functions(),
-        "6" => loop_and_if_statement(),
+        "4" => datatype::data_types(),
+        "5" => functions::functions(),
+        "6" => loop_and_if::loop_and_if_statement(),
         "7" => ownership(),
 
         // this is important to have in match without specifict operation / comparation function as the default return when there's no matches value
@@ -33,240 +38,6 @@ fn main() {
     };
 }
 
-fn ownership() {
-    let s1 = String::from("hello");
-    
-    // take ownership
-    // let s2 = s1;
-    // println!("{}, world!", s1);
-    // you can't access s1 variable because it's already transfered to s2 and s1 goes out of scope
-    
-    // take the value and register to new allocation memory
-    let s2 = s1.clone();
-    println!("s1 = {}, s2 = {}", s1, s2);
-
-    // primitive values by default make a copy rather than taking the ownership of the memory
-    let x = 5;
-    let y = x;
-    println!("x = {}, y = {}", x, y);
-
-    let mut s = String::from("hello");
-    append_string(&mut s);
-
-    let got_referenced = no_dangle();
-    println!("{}", got_referenced);
-}
-
-// this takes the param as reference and can be changed without making a return
-// this can only be done if the param is mutable 
-fn append_string(some_string: &mut String) {
-    some_string.push_str(", world");
-}
-
-// this function creates a copy of s as the return
-// but since the s is created inside the no_dungle function
-// this will deallocated s inside the no_dungle function
-// so you have to copy it instead of accessing invalid pointer or cleaned memory
-fn no_dangle() -> String {
-    let s = String::from("hello");
-    s
-}
-
-fn loop_and_if_statement() {
-    let mut counter = 0;
-    let result = loop {
-        counter += 1;
-
-        if counter == 3 {
-            break counter * 2; // this will break the loop and return the counter * 2 as the value of result
-        } else if counter == 1 {
-            println!("FIRST!");
-        } else {
-            println!("{}", counter); 
-        }
-    };
-
-    let condition = true;
-    let mut number = if condition { 3 } else { 5 };
-    println!("the result : {} and the number : {}", result, number);
-
-    while number > 0 {
-        print!("{}! ", number);
-        number -= 1;
-    }
-    print!("\n");
-
-    let a = [1, 2, 3, 4];
-    // enumerate func helps you to access both value and index from array
-    for (i, val) in a.iter().enumerate() {
-        println!("index {} val : {}", i, val);
-    }
-
-    // create a loop with (1, 2, 3) values but with reverse access
-    for num in (1..4).rev() {
-        print!("{}! ", num);
-    }
-}
-
-fn functions() {
-    println!("see the code to get into the detail\n1. function with primitive params\n2. function with tuple");
-
-    // you must be aware that the input is always string format.. not in array of characters
-    let mut selected_type = String::new();   
-    io::stdin()
-    .read_line(&mut selected_type)
-    .expect("please input the number of type correctly");
-    match selected_type.trim() {
-        "1" => {
-            let (a, b, c, d) = function_with_primitive_params(-13, false, 'a', 3.14);
-            println!("returned signed32 : {}\nreturned bool : {}\nreturned char : {}\nreturned float64 : {}", a, b, c, d);
-        },
-        "2" => {
-            let ((a, b, c), d) = function_with_tuple_params((32, "something", "better".into()), 123);
-            // or tuple into one variable 
-            // let (a, b) = function_with_tuple_params((32, "something", "better".into()), 123);
-            println!("returned tuple signed32 : {}\nreturned tuple str : {}\nreturned tuple String : {}\nreturned another payload : {}", a, b, c, d);
-        },
-        _ => println!("non selected"),
-    };
-}
-
-// as you can see that this func has tuple as param and integer with it.. you can actually play the params to parse and return as you can see below
-fn function_with_tuple_params(tuple_param: (u32, &str, String), id: u64) -> ((u32, &str, String), u64) {
-    let (a, b, c) = tuple_param;
-    ((a, b, c), id)
-}
-
-// a standard function that has param and return the primitive data type 
-fn function_with_primitive_params(a: i32, b: bool, c: char, d: f64) -> (i32, bool, char, f64) {
-    println!("parsed signed32 : {}\nparsed bool : {}\nparsed char : {}\nparsed float64 : {}", a, b, c, d);
-    (a, b, c, d) // return values doesn't need semicolon
-}
-
-fn data_types() {
-    println!("source : https://doc.rust-lang.org/book/ch03-02-data-types.html \n1. integer\n2. float\n3. boolean\n4. character");
-    println!("input the type");
-
-    // you must be aware that the input is always string format.. not in array of characters
-    let mut selected_type = String::new();   
-    io::stdin()
-    .read_line(&mut selected_type)
-    .expect("please input the number of type correctly");
-    match selected_type.trim() {
-        "1" => integer_data_types(),
-        "2" => float_data_types(),
-        "3" => bool_data_types(),
-        "4" => char_data_types(),
-        "5" => tuple_data_types(),
-        "6" => array_data_types(),
-        _ => println!("non selected"),
-    };
-}
-
-fn array_data_types() {
-    // array declaration without annotation, i think this will only confuse you since it's not declare with type..
-    // meaning you have to see the declared value
-    // actually you can hover the variable name and see the type on IDE, not on github, etc
-    let a = [1, 2, 3, 4];
-    let random_strings = ["asddcs", "ewr ddsf", "xcojao"];
-
-    // [data type; length]
-    let better_with_annotation : [i32; 5] = [1, 2, 3, 4, -5];
-
-    // declare an array with specific length and default value
-    // this array will have ["default", "default", "default"]
-    let default_array = ["default"; 3];
-
-    // accessing the array
-    println!("without annotation\narray of numbers at index 0 : {}\narray of random strings at index 1 : {}", a[0], random_strings[1]);
-    println!("with annotation at index 4 : {}", better_with_annotation[4]);
-    println!("with default value at index 2 : {}", default_array[2]);
-
-    println!("you cannot access declared array with out of the index pointing since the compailer will write down it as an error, see the code and un-comment");
-    // try to un-comment this to access out of index array
-    // println!("cannot : {}", random_strings[10]);
-}
-
-fn tuple_data_types() {
-    // once declared, they cannot grow or shrink in size.. meaning it's not a mutable data type
-    let tup_annotation : (i32, f32, u8) = (-124, 4.34, 8);
-    let tup_without_annotation = (1231, "something", true);
-
-    // how to access the value inside the tuple?
-    let (x, y, z) = tup_annotation; // declare like this
-    println!("tuple annotation,\nx : {}, y : {}, z : {}", x, y, z);
-    // or you can access directly like this
-    println!("access direct to the tuple :\ntuple.0 : {}, tuple.1: {}, tuple.2: {}", tup_without_annotation.0, tup_without_annotation.1, tup_without_annotation.2);
-
-}
-
-fn char_data_types() {
-    // remember the difference between string with "" and char with ''
-    // this is the same as usual
-    let normal_character = 'c';
-    println!("normal character : {}", normal_character);
-
-    // you can actually store the symbolic character like below
-    let symbolic_character = 'ℤ';
-    println!("symbolic character: {}", symbolic_character);
-
-    // and of course you can also store the emoticon like this
-    let emoticon = '😻';
-    println!("dude, it's emoticon : {}", emoticon);
-}
-
-fn bool_data_types() {
-    // simple as usual
-    let t = true; // declaration without annotation
-    let f : bool = false; //declaration with annotation
-    println!("without annotation {} and with annotation {} , see the code", t, f);
-}
-
-fn float_data_types() {
-    // string to float 32
-    let string_to_float32 : f32 = "2131.44534".parse().unwrap();
-    println!("on code string to float 32 be like : {}", string_to_float32);
-
-
-    println!("input a float number");
-    let mut input = String::new();
-    io::stdin()
-    .read_line(&mut input)
-    .expect("please input the correct number");
-    let input = input.trim();
-
-    // string to float 64
-    let string_to_float64 : f64 = input.parse().expect("please input the correct number");
-    println!("input {} convert to float64 : {}", input, string_to_float64);
-}
-
-fn integer_data_types() {
-    // use unwrap when the value is something no inputted from user
-    let string_to_int8: u8 = "8".parse().unwrap();
-    println!("on code string to int 8 will be like : {}", string_to_int8);
-
-    println!("input a number");
-    let mut input = String::new();
-    io::stdin()
-    .read_line(&mut input)
-    .expect("failed to read");
-
-    // shadowing variable on string
-    let input = input.trim();
-
-    // use .expect whenever you want to parse the input from user. so it will handle the input whether it's correct or not
-    // i think rust is the only programming language that has integer 128 even golang doesn't have AFAIK
-    let input_to_int128 : u128 = input.parse().expect("please input the number correctly");
-    println!("input {} to int128 : {}", input, input_to_int128);
-
-    // signed integer is ONLY for positive number
-    let signed_integer_32 : u32 = 124;
-    println!("signed integer 32 : {}", signed_integer_32);
-
-    // support both negative and positive number
-    let unsigned_integer_32_negative : i32 = -12736;
-    println!("unsigned integer 32 : {}", unsigned_integer_32_negative);
-}
 
 fn get_the_length_input() {
     println!("input something");
@@ -298,34 +69,4 @@ fn shadowing_example() {
 
     let x = x % 2; // this takes 2 and mod it with 2 => 2 % 2 = 0
     println!("the value of x at remainder is: {}", x);
-}
-
-fn guessing_number() {
-    println!("guess the number!");
-    let rand_number = rand::thread_rng().gen_range(1, 101);
-
-    loop {
-        println!("please input your guess.");
-        let mut guess = String::new();
-
-        // read input from terminal
-        io::stdin()
-            .read_line(&mut guess)
-            .expect("Failed to read line");
-
-        // shadow variable change string type to unsigned integer 32
-        let guess: u32 = match guess.trim().parse() {
-            Ok(num) => num,
-            Err(_) => continue,
-        };
-
-        match guess.cmp(&rand_number) {
-            Ordering::Less => println!("Too small!"),
-            Ordering::Greater => println!("Too big!"),
-            Ordering::Equal => {
-                println!("You win!");
-                break;
-            }
-        };
-    };
 }
